@@ -38,7 +38,11 @@ func main() {
 
 // Improve this
 func tweetPlease() {
-	api := anaconda.NewTwitterApiWithCredentials("", "", "", "")
+	api := anaconda.NewTwitterApiWithCredentials(
+		os.Getenv("TW_ACCESS_TOKEN"),
+		os.Getenv("TW_ACCESS_TOKEN_SECRET"),
+		os.Getenv("TW_CLIENT"),
+		os.Getenv("TW_CLIENT_VAR"))
 	var buff = new(bytes.Buffer)
 	lissajous(buff)
 	vals := url.Values{}
