@@ -38,8 +38,6 @@ func main() {
 
 // Improve this
 func tweetPlease() {
-	// "178848278-zkemS201RssNCnxRo6fF0dka4jvwJmdEn1KLvt4F",
-	//"n64pxfdGmYZZuyOBiETKdNx0sy4BuoC8bAtyYFukPcWn2", "X7k4YMZVwo1EPxA4apRPoEJPS", "6EgrBsM2XhoIGQloajpKjz0lPlDWBv8xGXKRX4wrzJbqldyzHZ"
 	api := anaconda.NewTwitterApiWithCredentials(
 		os.Getenv("TW_ACCESS_TOKEN"),
 		os.Getenv("TW_ACCESS_TOKEN_SECRET"),
