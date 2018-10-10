@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/ChimeraCoder/anaconda"
 )
@@ -20,18 +21,28 @@ import (
 // Declaramos la paleta de Colores que usaremos
 // `color` viene de el import `image/color`, y siempre se usa la última
 // parte en el código
-var palette = []color.Color{
-	color.Black,
-	color.RGBA{255, 10, 100, 1},
-	color.RGBA{0, 200, 50, 1},
-	color.RGBA{255, 0, 0, 1},
-	color.RGBA{0, 255, 0, 1},
-	color.RGBA{0, 0, 255, 1},
-}
-var cl = len(palette) - 1
+var palette []color.Color
+var cl int
 
 func main() {
 	// fmt.Println(cl)
+	rand.Seed(time.Now().UTC().UnixNano())
+	palette = []color.Color{
+		color.Black,
+		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+
+		// color.RGBA{255, 10, 100, 1},
+		// color.RGBA{0, 200, 50, 1},
+		// color.RGBA{255, 0, 0, 1},
+		// color.RGBA{0, 255, 0, 1},
+		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+	}
+	cl = len(palette) - 1
+
 	lissajous(os.Stdout)
 	// tweetPlease()
 }
@@ -65,17 +76,20 @@ func lissajous(out io.Writer) {
 		size    = 250     // la imagen medirá lo doble
 		nframes = 64
 		delay   = 4
+		imgSize = 350
 	)
 	m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
 	freq := rand.Float64() * m
 	anim := gif.GIF{LoopCount: nframes} // Creando un GIF
 	phase := 0.0
+	space := (imgSize - size)
+
 	for i := 0; i < nframes; i++ { // Creando cada cuadro de la animación
-		rect := image.Rect(0, 0, 2*size+1, 2*size+1) // Se usará como un plano cartesiano
+		rect := image.Rect(0, 0, 2*imgSize+1, 2*imgSize+1) // Se usará como un plano cartesiano
 		img := image.NewPaletted(rect, palette)
-		var index = uint8(rand.Intn(cl) + 1)
+		var index = uint8(rand.Intn(cl) + 1) // avoid black
 		var t2 float64
-		for t := 0.0; t < cycles*math.Pi; t += res {
+		for t := 0.0; t < cycles*2*math.Pi; t += res {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
 			t2 += res
@@ -97,9 +111,9 @@ func lissajous(out io.Writer) {
 			// } else {
 			// 	index = 0
 			// }
-			img.SetColorIndex(size+int(x*size), size+int(y*size), index)
+			img.SetColorIndex(size+space+int(x*size), size+space+int(y*size), index)
 		}
-		phase += math.Pi / 64
+		phase += 2 * math.Pi / 64
 		anim.Delay = append(anim.Delay, delay)
 		anim.Image = append(anim.Image, img)
 	}
