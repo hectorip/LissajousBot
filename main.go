@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	"gopkg.in/gomail.v2"
 )
 
 // Declaramos la paleta de Colores que usaremos
@@ -42,8 +43,8 @@ func main() {
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 	}
 	cl = len(palette) - 1
-
-	lissajous(os.Stdout)
+	sendMail("trigger@applet.ifttt.com", "Lissajous", fileName)
+	// lissajous(os.Stdout)
 	// tweetPlease()
 }
 
@@ -67,6 +68,29 @@ func tweetPlease() {
 	vals.Set("media_ids", strconv.FormatInt(media.MediaID, 10))
 	fmt.Println(media.MediaID)
 	api.PostTweet("Lissajous", vals)
+}
+
+func sendMail(mail string, body string, fileName string) {
+
+	from := os.Getenv("FROM_MAIL")
+	pass := os.Getenv("MAIL_PASS")
+	to := mail
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", from)
+	m.SetHeader("To", to)
+	// m.SetAddressHeader("Cc", "dan@example.com", "Dan")
+	m.SetHeader("Subject", "Hello!")
+	m.SetBody("text/html", body)
+	m.Attach(fileName)
+
+	d := gomail.NewDialer("smtp.gmail.com", 587, from, pass)
+
+	// Send the email to Bob, Cora and Dan.
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
 }
 func lissajous(out io.Writer) {
 	args := os.Args[1:] // ignorar el primer argumento que es el nombre del comando
