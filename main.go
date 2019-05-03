@@ -14,6 +14,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	// "bufio"
 
 	"github.com/ChimeraCoder/anaconda"
 	"gopkg.in/gomail.v2"
@@ -29,7 +30,7 @@ func main() {
 	// fmt.Println(cl)
 	rand.Seed(time.Now().UTC().UnixNano())
 	palette = []color.Color{
-		color.Black,
+		selectBGColor(),
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 
 		// color.RGBA{255, 10, 100, 1},
@@ -43,11 +44,25 @@ func main() {
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 	}
 	cl = len(palette) - 1
-	sendMail("trigger@applet.ifttt.com", "Lissajous", fileName)
-	// lissajous(os.Stdout)
+	name, writer := createFile()
+	lissajous(writer)
+	fmt.Println(name)
+	sendMail("trigger@applet.ifttt.com", "Lissajous", name)
 	// tweetPlease()
 }
 
+func selectBGColor() color.Color {
+	colors := []color.Color{color.Black, color.White}
+	index := int(math.Round(rand.Float64()))
+	return colors[index]
+}
+func createFile() (fileName string, writer io.Writer) {
+	fileName = fmt.Sprintf("gifs/%v.gif", time.Now().Unix())
+	writer, _ = os.Create(fileName)
+	// defer f.Close()
+	// writer = bufio.NewWriter(f)
+	return
+}
 // Improve this
 func tweetPlease() {
 	api := anaconda.NewTwitterApiWithCredentials(
@@ -98,8 +113,8 @@ func lissajous(out io.Writer) {
 	const ( // las constantes están disponibles en tiempo de compilación, ser números, strings o booleanos
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
-		nframes = 64
-		delay   = 4
+		nframes = 128
+		delay   = 2
 		imgSize = 350
 	)
 	m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
@@ -107,12 +122,13 @@ func lissajous(out io.Writer) {
 	anim := gif.GIF{LoopCount: nframes} // Creando un GIF
 	phase := 0.0
 	space := (imgSize - size)
-
+	r := cycles / nframes
 	for i := 0; i < nframes; i++ { // Creando cada cuadro de la animación
 		rect := image.Rect(0, 0, 2*imgSize+1, 2*imgSize+1) // Se usará como un plano cartesiano
 		img := image.NewPaletted(rect, palette)
 		var index = uint8(rand.Intn(cl) + 1) // avoid black
 		var t2 float64
+		cycles = cycles - r
 		for t := 0.0; t < cycles*2*math.Pi; t += res {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
