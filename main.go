@@ -44,7 +44,8 @@ func main() {
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 	}
 	cl = len(palette) - 1
-	name, writer := createFile()
+	storeDir := os.Args[1]
+	name, writer := createFile(storeDir)
 	cycles, freq, delay, decreasing := lissajous(writer)
 	fmt.Println(name)
 	body := fmt.Sprintf("Cycles: %d\nFreq: %2.f\nDelay: %d\nDecreasing: %t", int(cycles), freq, delay, (decreasing == 1))
@@ -57,8 +58,9 @@ func selectBGColor() color.Color {
 	index := int(math.Round(rand.Float64()))
 	return colors[index]
 }
-func createFile() (fileName string, writer io.Writer) {
-	fileName = fmt.Sprintf("gifs/%v.gif", time.Now().Unix())
+
+func createFile(dir string) (fileName string, writer io.Writer) {
+	fileName = fmt.Sprintf("%s/%v.gif", dir, time.Now().Unix())
 	writer, _ = os.Create(fileName)
 	// defer f.Close()
 	// writer = bufio.NewWriter(f)
