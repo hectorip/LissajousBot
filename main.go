@@ -47,8 +47,8 @@ func main() {
 	name, writer := createFile()
 	cycles, freq := lissajous(writer)
 	fmt.Println(name)
-	body := fmt.Sprintf("Lissajous - cycles: %d - freq: %2.f", cycles, freq)
-	sendMail("trigger@applet.ifttt.com", "Lissajous", name)
+	body := fmt.Sprintf("Params \nCycles: %d\nFreq: %2.f", cycles, freq)
+	sendMail("trigger@applet.ifttt.com", body, name)
 	// tweetPlease()
 }
 
@@ -121,7 +121,7 @@ func lissajous(out io.Writer) (cycles, freq float64) {
 		imgSize = 350
 	)
 	// m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
-	freq := rand.Float64() * 10
+	freq = rand.Float64() * 10
 	anim := gif.GIF{LoopCount: nframes} // Creando un GIF
 	phase := 0.0
 	space := (imgSize - size)
@@ -161,4 +161,5 @@ func lissajous(out io.Writer) (cycles, freq float64) {
 		anim.Image = append(anim.Image, img)
 	}
 	gif.EncodeAll(out, &anim)
+	return
 }
