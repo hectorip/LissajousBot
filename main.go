@@ -48,7 +48,7 @@ func main() {
 	name, writer := createFile(storeDir)
 	cycles, freq, delay, decreasing := lissajous(writer)
 	fmt.Println(name)
-	body := fmt.Sprintf("Cycles: %d\nFreq: %2.f\nDelay: %d\nDecreasing: %t", int(cycles), freq, delay, (decreasing == 1))
+	body := fmt.Sprintf("Cycles: %d\nFreq: %2.f\nDelay: %d\nDecreasing cycles: %t", int(cycles), freq, delay, (decreasing == 1))
 	sendMail("trigger@applet.ifttt.com", body, name)
 	// tweetPlease()
 }
@@ -98,7 +98,7 @@ func sendMail(mail string, body string, fileName string) {
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
 	// m.SetAddressHeader("Cc", "dan@example.com", "Dan")
-	m.SetHeader("Subject", "Hello!")
+	m.SetHeader("Subject", "Lissajous!")
 	m.SetBody("text/html", body)
 	m.Attach(fileName)
 
