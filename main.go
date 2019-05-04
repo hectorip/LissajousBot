@@ -47,7 +47,7 @@ func main() {
 	name, writer := createFile()
 	cycles, freq, delay, decreasing := lissajous(writer)
 	fmt.Println(name)
-	body := fmt.Sprintf("Params \nCycles: %d\nFreq: %2.f\nDelay: %d\nDecreasing: %t", int(cycles), freq, delay, (decreasing == 1))
+	body := fmt.Sprintf("Cycles: %d\nFreq: %2.f\nDelay: %d\nDecreasing: %t", int(cycles), freq, delay, (decreasing == 1))
 	sendMail("trigger@applet.ifttt.com", body, name)
 	// tweetPlease()
 }
@@ -118,7 +118,7 @@ func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 	const ( // las constantes están disponibles en tiempo de compilación, ser números, strings o booleanos
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
-		nframes = 128
+		nframes = 64
 		imgSize = 350
 	)
 	// m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
@@ -126,7 +126,7 @@ func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 	anim := gif.GIF{LoopCount: nframes} // Creando un GIF
 	phase := 0.0
 	space := (imgSize - size)
-	decreasing = rand.Intn(1)
+	decreasing = rand.Intn(2)
 	r := (cycles / nframes) * float64(decreasing)
 	for i := 0; i < nframes; i++ { // Creando cada cuadro de la animación
 		rect := image.Rect(0, 0, 2*imgSize+1, 2*imgSize+1) // Se usará como un plano cartesiano
