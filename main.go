@@ -45,9 +45,9 @@ func main() {
 	}
 	cl = len(palette) - 1
 	name, writer := createFile()
-	cycles, freq := lissajous(writer)
+	cycles, freq, delay := lissajous(writer)
 	fmt.Println(name)
-	body := fmt.Sprintf("Params \nCycles: %d\nFreq: %2.f", int(cycles), freq)
+	body := fmt.Sprintf("Params \nCycles: %d\nFreq: %2.f\nDelay: %d", int(cycles), freq, delay)
 	sendMail("trigger@applet.ifttt.com", body, name)
 	// tweetPlease()
 }
@@ -109,15 +109,16 @@ func sendMail(mail string, body string, fileName string) {
 
 }
 
-func lissajous(out io.Writer) (cycles, freq float64) {
+func lissajous(out io.Writer) (oCycles, freq float64, delay int) {
 	// args := os.Args[1:] // ignorar el primer argumento que es el nombre del comando
 	// cycles, _ := strconv.ParseFloat(args[0], 64)
-	cycles = rand.Float64() * 50 // Some number between 0 and 50
+	cycles := rand.Float64() * 50 // Some number between 0 and 50
+	oCycles = cycles
+	delay = rand.Intn(20) + 1
 	const ( // las constantes están disponibles en tiempo de compilación, ser números, strings o booleanos
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
 		nframes = 128
-		delay   = 2
 		imgSize = 350
 	)
 	// m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
