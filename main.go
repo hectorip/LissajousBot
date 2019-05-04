@@ -107,9 +107,11 @@ func sendMail(mail string, body string, fileName string) {
 	}
 
 }
+
 func lissajous(out io.Writer) {
-	args := os.Args[1:] // ignorar el primer argumento que es el nombre del comando
-	cycles, _ := strconv.ParseFloat(args[0], 64)
+	// args := os.Args[1:] // ignorar el primer argumento que es el nombre del comando
+	// cycles, _ := strconv.ParseFloat(args[0], 64)
+	cycles := rand.Float64() * 50 // Some number between 0 and 50
 	const ( // las constantes están disponibles en tiempo de compilación, ser números, strings o booleanos
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
@@ -117,8 +119,8 @@ func lissajous(out io.Writer) {
 		delay   = 2
 		imgSize = 350
 	)
-	m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
-	freq := rand.Float64() * m
+	// m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
+	freq := rand.Float64() * 10
 	anim := gif.GIF{LoopCount: nframes} // Creando un GIF
 	phase := 0.0
 	space := (imgSize - size)
