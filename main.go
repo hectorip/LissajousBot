@@ -45,8 +45,9 @@ func main() {
 	}
 	cl = len(palette) - 1
 	name, writer := createFile()
-	lissajous(writer)
+	cycles, freq := lissajous(writer)
 	fmt.Println(name)
+	body := fmt.Sprintf("Lissajous - cycles: %d - freq: %2.f", cycles, freq)
 	sendMail("trigger@applet.ifttt.com", "Lissajous", name)
 	// tweetPlease()
 }
@@ -82,7 +83,7 @@ func tweetPlease() {
 	}
 	vals.Set("media_ids", strconv.FormatInt(media.MediaID, 10))
 	fmt.Println(media.MediaID)
-	api.PostTweet("Lissajous", vals)
+	api.PostTweet("Lissjous", vals)
 }
 
 func sendMail(mail string, body string, fileName string) {
@@ -108,10 +109,10 @@ func sendMail(mail string, body string, fileName string) {
 
 }
 
-func lissajous(out io.Writer) {
+func lissajous(out io.Writer) (cycles, freq float64) {
 	// args := os.Args[1:] // ignorar el primer argumento que es el nombre del comando
 	// cycles, _ := strconv.ParseFloat(args[0], 64)
-	cycles := rand.Float64() * 50 // Some number between 0 and 50
+	cycles = rand.Float64() * 50 // Some number between 0 and 50
 	const ( // las constantes están disponibles en tiempo de compilación, ser números, strings o booleanos
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
