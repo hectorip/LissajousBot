@@ -47,7 +47,7 @@ func main() {
 	name, writer := createFile()
 	cycles, freq := lissajous(writer)
 	fmt.Println(name)
-	body := fmt.Sprintf("Params \nCycles: %d\nFreq: %2.f", cycles, freq)
+	body := fmt.Sprintf("Params \nCycles: %d\nFreq: %2.f", int(cycles), freq)
 	sendMail("trigger@applet.ifttt.com", body, name)
 	// tweetPlease()
 }
