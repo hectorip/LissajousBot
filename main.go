@@ -18,6 +18,8 @@ import (
 
 	"github.com/ChimeraCoder/anaconda"
 	"gopkg.in/gomail.v2"
+	"github.com/joho/godotenv"
+
 )
 
 // Declaramos la paleta de Colores que usaremos
@@ -28,29 +30,33 @@ var cl int
 
 func main() {
 	// fmt.Println(cl)
+	godotenv.Load()
+
 	rand.Seed(time.Now().UTC().UnixNano())
 	palette = []color.Color{
 		selectBGColor(),
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 
-		// color.RGBA{255, 10, 100, 1},
-		// color.RGBA{0, 200, 50, 1},
-		// color.RGBA{255, 0, 0, 1},
-		// color.RGBA{0, 255, 0, 1},
-		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
-		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
-		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
-		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
-		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		color.RGBA{255, 10, 100, 1},
+		color.RGBA{0, 200, 50, 1},
+		color.RGBA{255, 0, 0, 1},
+		color.RGBA{0, 255, 0, 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 	}
 	cl = len(palette) - 1
 	storeDir := os.Args[1]
 	name, writer := createFile(storeDir)
 	cycles, freq, delay, decreasing := lissajous(writer)
 	fmt.Println(name)
-	body := fmt.Sprintf("Cycles: %d\nFreq: %2.f\nDelay: %d\nDecreasing cycles: %t", int(cycles), freq, delay, (decreasing == 1))
-	sendMail("trigger@applet.ifttt.com", body, name)
-	// tweetPlease()
+	body := fmt.Sprintf("Cycle count: %d\nFrequency: %2.f\nDelay: %d\nDecrease cycles: %t", int(cycles), freq, delay, (decreasing == 1))
+	// sendMail("trigger@applet.ifttt.com", body, name)
+	if len(os.Args) > 2 && os.Args[2] == "tweet" {
+		tweetPlease(body, writer)
+	}
 }
 
 func selectBGColor() color.Color {
@@ -59,6 +65,7 @@ func selectBGColor() color.Color {
 	return colors[index]
 }
 
+// createFile names and creates a file in the storeDir using Unixtime as the name
 func createFile(dir string) (fileName string, writer io.Writer) {
 	fileName = fmt.Sprintf("%s/%v.gif", dir, time.Now().Unix())
 	writer, _ = os.Create(fileName)
@@ -66,15 +73,17 @@ func createFile(dir string) (fileName string, writer io.Writer) {
 	// writer = bufio.NewWriter(f)
 	return
 }
-// Improve this
-func tweetPlease() {
+
+
+// Improve this how?
+func tweetPlease(body string, fileName string ) {
 	api := anaconda.NewTwitterApiWithCredentials(
 		os.Getenv("TW_ACCESS_TOKEN"),
 		os.Getenv("TW_ACCESS_TOKEN_SECRET"),
 		os.Getenv("TW_CLIENT"),
 		os.Getenv("TW_CLIENT_SECRET"))
-	var buff = new(bytes.Buffer)
-	lissajous(buff)
+	// var buff = new(bytes.Buffer)
+	// lissajous(buff)
 	vals := url.Values{}
 	encodedString := base64.StdEncoding.EncodeToString(buff.Bytes())
 
@@ -85,7 +94,7 @@ func tweetPlease() {
 	}
 	vals.Set("media_ids", strconv.FormatInt(media.MediaID, 10))
 	fmt.Println(media.MediaID)
-	api.PostTweet("Lissjous", vals)
+	api.PostTweet(body, vals)
 }
 
 func sendMail(mail string, body string, fileName string) {
@@ -142,10 +151,10 @@ func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 			t2 += res
 
 			// Changing color every cycle
-			// if math.Pi*-t2 <= 0.1 {
-			// 	index = uint8(rand.Intn(cl) + 1)
-			// 	t2 = 0
-			// }
+			if math.Pi*-t2 <= 0.1 {
+				index = uint8(rand.Intn(cl) + 1)
+				t2 = 0
+			}
 			// Creating stripes of specific colors across all
 			// the frames
 
