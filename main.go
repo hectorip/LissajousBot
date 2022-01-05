@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	"io/ioutil"
 	"encoding/base64"
 	"fmt"
 	"image"
@@ -19,6 +19,7 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 	"gopkg.in/gomail.v2"
 	"github.com/joho/godotenv"
+	"github.com/lucasb-eyer/go-colorful"
 
 )
 
@@ -33,7 +34,25 @@ func main() {
 	godotenv.Load()
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	palette = []color.Color{
+	dark := bool(rand.Intn(1))
+	palette = selectPalette(dark)
+	cl = len(palette) - 1
+	storeDir := os.Args[1]
+	name, writer := createFile(storeDir)
+	cycles, freq, delay, decreasing := lissajous(writer)
+	fmt.Println(name)
+	body := fmt.Sprintf("Cycle count: %d\nFrequency: %2.f\nDelay: %d\nDecrease cycles: %t", int(cycles), freq, delay, (decreasing == 1))
+	// sendMail("trigger@applet.ifttt.com", body, name)
+	if len(os.Args) > 2 && os.Args[2] == "tweet" {
+		tweetPlease(body, name)
+	}
+}
+
+
+func selectPalette(dark bool) []color.Color {
+	// load palettes
+	// Select based on dark or light
+	return []color.Color{
 		selectBGColor(),
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 
@@ -47,16 +66,6 @@ func main() {
 		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
 	}
-	cl = len(palette) - 1
-	storeDir := os.Args[1]
-	name, writer := createFile(storeDir)
-	cycles, freq, delay, decreasing := lissajous(writer)
-	fmt.Println(name)
-	body := fmt.Sprintf("Cycle count: %d\nFrequency: %2.f\nDelay: %d\nDecrease cycles: %t", int(cycles), freq, delay, (decreasing == 1))
-	// sendMail("trigger@applet.ifttt.com", body, name)
-	if len(os.Args) > 2 && os.Args[2] == "tweet" {
-		tweetPlease(body, writer)
-	}
 }
 
 func selectBGColor() color.Color {
@@ -68,7 +77,7 @@ func selectBGColor() color.Color {
 // createFile names and creates a file in the storeDir using Unixtime as the name
 func createFile(dir string) (fileName string, writer io.Writer) {
 	fileName = fmt.Sprintf("%s/%v.gif", dir, time.Now().Unix())
-	writer, _ = os.Create(fileName)
+	writer,  _ = os.Create(fileName)
 	// defer f.Close()
 	// writer = bufio.NewWriter(f)
 	return
@@ -85,7 +94,10 @@ func tweetPlease(body string, fileName string ) {
 	// var buff = new(bytes.Buffer)
 	// lissajous(buff)
 	vals := url.Values{}
-	encodedString := base64.StdEncoding.EncodeToString(buff.Bytes())
+	// file.Read(buff.Bytes())
+	bytefile, err := ioutil.ReadFile(fileName)
+
+	encodedString := base64.StdEncoding.EncodeToString(bytefile)
 
 	media, err := api.UploadMedia(encodedString)
 	if err != nil {
@@ -123,14 +135,14 @@ func sendMail(mail string, body string, fileName string) {
 func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 	// args := os.Args[1:] // ignorar el primer argumento que es el nombre del comando
 	// cycles, _ := strconv.ParseFloat(args[0], 64)
-	cycles := rand.Float64() * 50 // Some number between 0 and 50
+	cycles := rand.Float64() * 20 // Some number between 0 and 50
 	oCycles = cycles
 	delay = rand.Intn(10) + 1
 	const ( // las constantes están disponibles en tiempo de compilación, ser números, strings o booleanos
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
-		nframes = 64
-		imgSize = 350
+		nframes = 128
+		imgSize = 200
 	)
 	// m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
 	freq = rand.Float64() * 10
@@ -151,10 +163,10 @@ func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 			t2 += res
 
 			// Changing color every cycle
-			if math.Pi*-t2 <= 0.1 {
-				index = uint8(rand.Intn(cl) + 1)
-				t2 = 0
-			}
+			// if math.Pi*-t2 <= 0.1 {
+			// 	index = uint8(rand.Intn(cl) + 1)
+			// 	t2 = 0
+			// }
 			// Creating stripes of specific colors across all
 			// the frames
 
