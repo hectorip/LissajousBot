@@ -19,7 +19,7 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 	"gopkg.in/gomail.v2"
 	"github.com/joho/godotenv"
-	"github.com/lucasb-eyer/go-colorful"
+	// "github.com/lucasb-eyer/go-colorful"
 
 )
 
@@ -34,7 +34,7 @@ func main() {
 	godotenv.Load()
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	dark := bool(rand.Intn(1))
+	dark := rand.Intn(1) == 1
 	palette = selectPalette(dark)
 	cl = len(palette) - 1
 	storeDir := os.Args[1]
@@ -52,6 +52,56 @@ func main() {
 func selectPalette(dark bool) []color.Color {
 	// load palettes
 	// Select based on dark or light
+	return []color.Color{
+		color.RGBA{0x00, 0x00, 0x00, 0xff},
+		color.RGBA{ 0, 0, 25, 1},
+		color.RGBA{ 0, 0, 50, 1},
+		color.RGBA{ 0, 0, 75, 1},
+		color.RGBA{ 0, 0, 100, 1},
+		color.RGBA{ 0, 0, 125, 1},
+		color.RGBA{ 0, 0, 150, 1},
+		color.RGBA{ 0, 0, 175, 1},
+		color.RGBA{ 0, 0, 200, 1},
+		color.RGBA{ 0, 0, 225, 1},
+		color.RGBA{ 0, 0, 255, 1},
+		color.RGBA{ 0, 0, 225, 1},
+		color.RGBA{ 0, 0, 200, 1},
+		color.RGBA{ 0, 0, 175, 1},
+		color.RGBA{ 0, 0, 150, 1},
+		color.RGBA{ 0, 0, 125, 1},
+		color.RGBA{ 0, 0, 100, 1},
+		color.RGBA{ 0, 0, 75, 1},
+		color.RGBA{ 0, 0, 50, 1},
+		color.RGBA{ 0, 0, 25, 1},
+	}
+	return []color.Color{
+		selectBGColor(),
+		color.RGBA{ 25, 0, 0, 1},
+		color.RGBA{50, 0, 0, 1},
+		color.RGBA{75, 0, 0, 1},
+		color.RGBA{100, 0, 0, 1},
+		color.RGBA{125, 0, 0, 1},
+		color.RGBA{150, 0, 0, 1},
+		color.RGBA{175, 0, 0, 1},
+		color.RGBA{200, 0, 0, 1},
+		color.RGBA{225, 0, 0, 1},
+		color.RGBA{255, 0, 0, 1},
+		color.RGBA{225, 0, 0, 1},
+		color.RGBA{200, 0, 0, 1},
+		color.RGBA{175, 0, 0, 1},
+		color.RGBA{150, 0, 0, 1},
+		color.RGBA{125, 0, 0, 1},
+		color.RGBA{100, 0, 0, 1},
+		color.RGBA{75, 0, 0, 1},
+		color.RGBA{50, 0, 0, 1},
+		color.RGBA{25, 0, 0, 1},
+		// color.RGBA{0, 0, 0, 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+		// color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
+	}
 	return []color.Color{
 		selectBGColor(),
 		color.RGBA{uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256)), 1},
@@ -142,7 +192,7 @@ func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 		res     = 0.00001 // 'sharpnesss'
 		size    = 250     // la imagen medirá lo doble
 		nframes = 128
-		imgSize = 200
+		imgSize = 400
 	)
 	// m, _ := strconv.ParseFloat(args[1], 64) // Mulitplicador de la Frecuencia
 	freq = rand.Float64() * 10
@@ -151,10 +201,13 @@ func lissajous(out io.Writer) (oCycles, freq float64, delay, decreasing int) {
 	space := (imgSize - size)
 	decreasing = rand.Intn(2)
 	r := (cycles / nframes) * float64(decreasing)
+	frames_color := int(nframes/cl)
+
 	for i := 0; i < nframes; i++ { // Creando cada cuadro de la animación
 		rect := image.Rect(0, 0, 2*imgSize+1, 2*imgSize+1) // Se usará como un plano cartesiano
 		img := image.NewPaletted(rect, palette)
 		var index = uint8(rand.Intn(cl) + 1) // avoid black
+		index = uint8(i / frames_color) + 1
 		var t2 float64
 		cycles = cycles - r
 		for t := 0.0; t < cycles*2*math.Pi; t += res {
